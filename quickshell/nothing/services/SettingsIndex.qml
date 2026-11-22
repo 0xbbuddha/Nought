@@ -30,9 +30,16 @@ Singleton {
     readonly property int pageDock: 8
     readonly property int pageNet: 9
     readonly property int pageGame: 10
-    readonly property int pageAbout: 11
+    readonly property int pageHub: 11
+    readonly property int pageAbout: 12
 
     readonly property var entries: [
+        // ── Hub ───────────────────────────────────────────────────────
+        { key: "fanEnabled", label: "Fan control", page: root.pageHub, words: "fan cooler pwm curve speed rpm hwmon control", icon: "󰈐" },
+        { key: "fanApply", label: "Apply the fan curve", page: root.pageHub, words: "fan curve apply pwm start stop release", icon: "󰈐" },
+        { key: "fanCurve", label: "Fan curve", page: root.pageHub, words: "fan curve temperature speed pwm", icon: "󰈐" },
+        { key: "hubSessions", label: "Game sessions", page: root.pageHub, words: "game session running steam wine proton lutris", icon: "󰊗" },
+        { key: "hubTools", label: "Gaming tools", page: root.pageHub, words: "mangohud gamemode amdgpu_top steam sensors", icon: "󰓅" },
         // ── Appearance ────────────────────────────────────────────────
         { key: "theme",      label: "Dark, light or manga", page: root.pageLook, words: "theme dark light manga anime appearance colour scheme", icon: "󰝨" },
         { key: "scale",      label: "Interface size",   page: root.pageLook, words: "scale zoom size dpi big small", icon: "󰫰" },

@@ -171,7 +171,6 @@ Singleton {
     property alias gameHideShell: a.gameHideShell
     property alias gameUnfocusedFps: a.gameUnfocusedFps
     property alias gameFpsLimit: a.gameFpsLimit
-
     property alias crosshair: a.crosshair
     property alias crosshairStyle: a.crosshairStyle
     property alias crosshairSize: a.crosshairSize
@@ -179,6 +178,13 @@ Singleton {
     property alias crosshairGap: a.crosshairGap
     property alias crosshairColor: a.crosshairColor
     property alias crosshairOutline: a.crosshairOutline
+    property alias gameAutoList: a.gameAutoList
+    property alias glyphNotifyUrgent: a.glyphNotifyUrgent
+    property alias fanEnabled: a.fanEnabled
+    property alias fanApply: a.fanApply
+    property alias fanId: a.fanId
+    property alias fanCurve: a.fanCurve
+
     property alias gameNotes: a.gameNotes
     property alias gameWidgets: a.gameWidgets
     property alias gameImage: a.gameImage
@@ -1017,6 +1023,12 @@ Singleton {
         a.idleOff = 600;
         a.idleSuspend = 1200;
 
+        a.fanCurve = [];
+        a.fanEnabled = false;
+        a.fanApply = false;
+        a.fanId = "";
+        a.gameAutoList = [];
+        a.glyphNotifyUrgent = "";
         a.gameMode = false;
         a.gameNoAnimations = true;
         a.gameNoBlur = true;
@@ -1326,6 +1338,20 @@ Singleton {
             property bool   essentialSearch: true    // mix captures + Ask in SUPER
             property string mindBackend: "stub"      // stub | ollama | gemini
             property string translateLang: "English" // target language for screen translation
+
+            // ── Gaming hub ────────────────────────────────────────────
+            // The window classes that count as a game, for the session
+            // list. A trailing * covers the classes Steam hands its
+            // games: "steam_app*" is every one of them.
+            property var gameAutoList: []
+            // A notification at urgency 2 plays this pattern instead of
+            // the app's own rhythm.
+            property string glyphNotifyUrgent: ""
+
+            property bool fanEnabled: false
+            property bool fanApply: false
+            property string fanId: ""
+            property var fanCurve: [{ t: 40, p: 40 }, { t: 60, p: 120 }, { t: 75, p: 255 }]
 
             property bool   weatherEnabled: false
             property string weatherCity: ""

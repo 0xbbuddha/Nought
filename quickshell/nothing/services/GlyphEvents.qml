@@ -159,8 +159,23 @@ Singleton {
         fall.stop();
         root.event = "notify";
         const mine = Config.glyphAppPattern(appId);
+        // Priority beats the app's own rhythm: a bank's "confirm this
+        // payment" has to look like every other critical, not like
+        // whatever Spotify was given.
+        if (root.urgent && Config.glyphNotifyUrgent !== "") {
+            root.play(Config.glyphNotifyUrgent);
+            return;
+        }
         root.play(mine !== "" ? mine : Config.glyphPattern(root.surface, "notify"));
     }
+
+    // The notification the pulse is for. Urgency is what a priority
+    // setting needs, and Notifs keeps it on every entry it holds.
+    readonly property bool urgent: {
+        const n = Notifs.history[0];
+        return n?.urgency === 2;
+    }
+
 
     // ── Composed patterns ─────────────────────────────────────────────
     //

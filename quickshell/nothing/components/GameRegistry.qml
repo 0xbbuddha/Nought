@@ -19,7 +19,9 @@ Singleton {
         { id: "clock",     label: "Clock",      short: "TIME",  icon: "󰥔",
           hint: "Dot-matrix time",                w: 200, h: 88 },
         { id: "image",     label: "Reference",  short: "REF",   icon: "󰋩",
-          hint: "Pinned screenshot or build order", w: 280, h: 200 }
+          hint: "Pinned screenshot or build order", w: 280, h: 200 },
+        { id: "hub",       label: "Hub",        short: "HUB",   icon: "󰊗",
+          hint: "CPU, RAM, GPU, VRAM and temperatures", w: 240, h: 150 }
     ]
 
     function meta(id: string): var { return all.find(w => w.id === id) ?? null; }

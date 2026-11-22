@@ -476,6 +476,7 @@ PanelWindow {
                                             SettingsPageDock {}
                             SettingsPageNet {}
                             SettingsPageGame {}
+                            SettingsPageHub {}
                             SettingsPageAbout {}
                         }
 
