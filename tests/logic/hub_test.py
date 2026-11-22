@@ -5,6 +5,7 @@ storage walk. No hardware, no /sys, no network.
     tests/logic/hub_test.py
 """
 import os
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -57,6 +58,19 @@ with tempfile.TemporaryDirectory() as sysroot:
     check("fanconf refuses an unknown fan", fan_conf("hwmon99/fan9", "hwmon3/temp1", "40=40") == "")
     # A curve with a stray entry is rejected rather than rounded.
     check("fanconf refuses a curve with no pairs", fan_conf("hwmon3/fan1", "hwmon3/temp1", "nope") == "")
+
+# ── main()'s own CLI dispatch, not just the function ─────────────────
+# fan_conf() being right is not the same as `hub.py fanconf <fan> <temp>
+# <curve>` ever reaching it: main()'s own argv count gate missed by one,
+# and every call this script ever makes (exactly three arguments after
+# "fanconf") fell through to the catch-all "[]" silently - the function
+# tests above never touch main() at all, so they never saw it.
+out = subprocess.run(
+    [sys.executable, str(HERE.parent.parent / "scripts" / "hub.py"),
+     "fanconf", "bogus/fan1", "bogus/temp1", "40=40"],
+    text=True, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=5).stdout
+check("fanconf is dispatched by main(), not swallowed by the catch-all",
+      out.strip() != "[]")
 
 # ── cpu_temp: the chassis sensor is not the CPU ──────────────────────
 rows = [{"name": "acpitz", "c": 30.0}, {"name": "Tctl", "c": 61.5},

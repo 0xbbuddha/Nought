@@ -328,7 +328,7 @@ def main() -> None:
     elif cmd == "palette" and len(sys.argv) > 2:
         n = int(sys.argv[3]) if len(sys.argv) > 3 and sys.argv[3].isdigit() else 5
         print(json.dumps(palette(sys.argv[2], n)))
-    elif cmd == "fanconf" and len(sys.argv) > 5:
+    elif cmd == "fanconf" and len(sys.argv) > 4:
         # hub.py fanconf <hwmonX/fanN> <hwmonY/tempZ> <t=p,t=p,...>
         print(fan_conf(sys.argv[2], sys.argv[3], sys.argv[4]))
     else:
