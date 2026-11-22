@@ -82,9 +82,12 @@ SettingsPage {
 
         SettingRow {
             key: "hubGpu"
+            // visible guards the row's own rendering, not the other
+            // bindings on it: Hub.gpus can still be empty the instant
+            // hasGpu flips, so every read here goes through ?? too.
             visible: Hub.hasGpu
-            label: Hub.gpus[0].name
-            hint: Hub.gpus[0].busy >= 0
+            label: Hub.gpus[0]?.name ?? ""
+            hint: (Hub.gpus[0]?.busy ?? -1) >= 0
                 ? Hub.gpus[0].busy + "% · " + Hub.gpus[0].vramUsed + " / "
                   + Hub.gpus[0].vramTotal + " MB"
                 : "no counter the driver exposes"

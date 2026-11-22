@@ -157,11 +157,17 @@ def mem() -> dict:
 
 def cpu_temp(rows: list) -> float:
     """The hottest reading that belongs to a CPU, or -1. The chassis
-    sensor is left out: it follows the lid, not the load."""
+    sensor (acpitz, the usual ACPI thermal zone) is left out: it
+    follows the lid, not the load. Tctl/Tdie are AMD's own labels for
+    the control and die temperatures - on plenty of boards that is the
+    only CPU-shaped name there is, "cpu"/"core"/"package" never appear."""
     best = -1.0
     for t in rows:
         name = t["name"].lower()
-        if "cpu" in name or "core" in name or "package" in name or name.startswith("acpi"):
+        if name.startswith("acpi"):
+            continue
+        if "cpu" in name or "core" in name or "package" in name \
+                or "tctl" in name or "tdie" in name:
             best = max(best, t["c"])
     return best
 
@@ -250,22 +256,27 @@ def palette(image: str, count: int = 5) -> list:
         return []
 
 
-def fan_conf(fan_id: str, temp_id: str, curve: str) -> str:
+def fan_conf(fan_id: str, temp_id: str, curve: str, sys_root: str = "/sys") -> str:
     """A fancontrol.conf for one fan and one temperature sensor.
 
     `curve` is "temp=pwm,temp=pwm", ascending. Nothing is written here:
     the caller writes the file, and fancontrol -c is what drives the
     fan. Its own format is used unchanged, because a second writer on
     the same register is the one way to make a fan oscillate.
+
+    `sys_root` is "/sys" in production; a test points it at a fake tree
+    instead, so the result stops depending on which hwmon number this
+    particular machine happens to put a fan on.
     """
-    base = f"/sys/class/hwmon/{fan_id.split('/')[0]}"
+    hwmon = f"{sys_root}/class/hwmon"
+    base = f"{hwmon}/{fan_id.split('/')[0]}"
     n = fan_id.split("fan")[1] if "fan" in fan_id else ""
     if not os.path.isdir(base) or not n.isdigit():
         return ""
     pwm_path = f"{base}/pwm{n}"
     if not os.path.isfile(pwm_path):
         return ""
-    temp_path = f"/sys/class/hwmon/{temp_id}_input"
+    temp_path = f"{hwmon}/{temp_id}_input"
     if not os.path.isfile(temp_path):
         return ""
     pairs = []
@@ -280,9 +291,9 @@ def fan_conf(fan_id: str, temp_id: str, curve: str) -> str:
     # /sys it hangs off, minus the hwmon number, which the kernel
     # reassigns on boot.
     real = os.path.realpath(base)
-    if not real.startswith("/sys/"):
+    if not real.startswith(sys_root + "/"):
         return ""
-    devpath = real[len("/sys/"):]
+    devpath = real[len(sys_root) + 1:]
     tail = f"/hwmon/{fan_id.split('/')[0]}"
     if devpath.endswith(tail):
         devpath = devpath[: -len(tail)]
@@ -295,12 +306,12 @@ def fan_conf(fan_id: str, temp_id: str, curve: str) -> str:
         f"DEVPATH={devpath}",
         f"DEVNAME={name}",
         f"FCTEMPS={fan_id}={temp_id}_input",
-        f"FCFANS={fan_id}={fan_id}/fan{n}_input".replace("/fan"+n+"/fan"+n, "/fan"+n),
+        f"FCFANS={fan_id}={fan_id}_input",
         f"MINTEMP={fan_id}={pairs[0][0]}",
         f"MAXTEMP={fan_id}={pairs[-1][0]}",
         f"MINPWM={fan_id}={pairs[0][1]}",
         f"MAXPWM={fan_id}={pairs[-1][1]}",
-	]
+    ]
     return "\n".join(lines)
 
 

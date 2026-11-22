@@ -89,13 +89,6 @@ Singleton {
         if (Config.fanEnabled && Config.fanApply) apply();
     }
 
-    function pick(): string {
-        const rows = Hub.fans;
-        if (Config.fanId !== "" && rows.some(f => f.id === Config.fanId))
-            return Config.fanId;
-        return rows.find(f => f.drivable)?.id ?? "";
-    }
-
     // The sensor is picked from the fan's own chip: the one on the same
     // board is the one that moves with it, and an unrelated sensor gives
     // a curve that never reaches its ceiling.
@@ -134,10 +127,13 @@ Singleton {
     }
 
     // Releasing is the same dialogue: stop fancontrol, and the board's
-    // own curve takes over again.
+    // own curve takes over again. Its own process, not pkexec reused
+    // with a different command swapped in - a release that ran after an
+    // apply queued up would otherwise find pkexec already holding this
+    // command and never the one that starts fancontrol again.
     function release(): void {
-        pkexec.command = ["pkexec", "sh", "-c", 'pkill -x fancontrol 2>/dev/null || true'];
-        pkexec.running = true;
+        stopper.command = ["pkexec", "sh", "-c", 'pkill -x fancontrol 2>/dev/null || true'];
+        stopper.running = true;
     }
 
     function toggle(): void {
@@ -146,14 +142,12 @@ Singleton {
     }
 
     // ── Build and run ─────────────────────────────────────────────────
-    NProcess { id: builder; quiet: true }
-
     // hub.py's answer is fancontrol's own file, already validated. An
     // empty one means it refused this fan: no PWM, or a sensor on another
     // chip, and that reads as a message rather than as a dialogue that
     // cannot do anything.
     NProcess {
-        id: builderOut
+        id: builder
         quiet: true
         stdout: StdioCollector {
             onStreamFinished: {
@@ -173,8 +167,23 @@ Singleton {
         }
     }
 
+    // Writes the file as the user, no root needed for that part - only
+    // starting fancontrol touches a register.
     NProcess {
-        id: pkexec
+        id: writer
+        quiet: true
+        onExited: (code) => {
+            if (code !== 0) {
+                root.applying = false;
+                root.fault = "could not write the fan-control file";
+                return;
+            }
+            starter.running = true;
+        }
+    }
+
+    NProcess {
+        id: starter
         quiet: true
         command: ["pkexec", "sh", "-c",
             'conf="$HOME/.config/nothing/fan-control.conf"'
@@ -186,5 +195,11 @@ Singleton {
                 root.fault = "fancontrol could not start - the dialogue was "
                     + "refused, or the board refused the file";
         }
+    }
+
+    NProcess {
+        id: stopper
+        quiet: true
+        command: []
     }
 }
