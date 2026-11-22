@@ -207,6 +207,47 @@ ColumnLayout {
                 Layout.fillWidth: true
                 Layout.topMargin: Theme.px(4)
                 spacing: Theme.px(8)
+                visible: Config.glyphEventsOf(root.surface).indexOf("notify") >= 0
+
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 0
+                    NText { text: "Priority" }
+                    NText {
+                        Layout.fillWidth: true
+                        text: "A critical notification plays this rhythm, "
+                            + "ahead of the app's own one or the default above"
+                        color: Theme.c.onDim
+                        font.pixelSize: Theme.f.tiny
+                        wrapMode: Text.WordWrap
+                    }
+                }
+
+                // Default (no override), then every pattern - same cycle
+                // idiom as the per-app pickers above.
+                NPillButton {
+                    maxWidth: Theme.px(132)
+                    readonly property string current: Config.glyphNotifyUrgent
+                    text: current !== ""
+                        ? GlyphEvents.patternLabel(current) : "Default"
+                    onActivated: {
+                        const list = [""].concat(GlyphEvents.patterns.map(p => p.id));
+                        let at = list.indexOf(current);
+                        if (at < 0)
+                            at = 0;
+                        const next = list[(at + 1) % list.length];
+                        Config.glyphNotifyUrgent = next;
+                        Config.save();
+                        if (next !== "")
+                            GlyphEvents.preview(next);
+                    }
+                }
+            }
+
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.topMargin: Theme.px(4)
+                spacing: Theme.px(8)
 
                 ColumnLayout {
                     Layout.fillWidth: true

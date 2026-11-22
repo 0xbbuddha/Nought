@@ -178,6 +178,7 @@ PanelWindow {
                     sourceComponent: {
                         switch (gw.wid) {
                         case "resources": return cRes;
+                        case "hub":       return cHub;
                         case "fps":       return cFps;
                         case "recorder":  return cRec;
                         case "mixer":     return cMix;
@@ -193,6 +194,7 @@ PanelWindow {
     }
 
     Component { id: cRes;   GResources {} }
+    Component { id: cHub;   GHub {} }
     Component { id: cFps;   GFps {} }
     Component { id: cRec;   GRecorder {} }
     Component { id: cMix;   GMixer {} }
