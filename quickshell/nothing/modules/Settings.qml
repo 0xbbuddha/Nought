@@ -135,6 +135,16 @@ PanelWindow {
             "1111111",
             "0011100",
             "0011100"] },
+        // A fan's own four blades around a hub: temperatures, the fan
+        // curve, the sessions this page reads out.
+        { key: "hub", label: "Hub", glyph: [
+            "0001000",
+            "0101010",
+            "0010100",
+            "1111111",
+            "0010100",
+            "0101010",
+            "0001000"] },
         { key: "about", label: "System", glyph: [
             "0001000",
             "0001000",
@@ -367,8 +377,8 @@ PanelWindow {
                                 readonly property bool active: stack.currentIndex === index
 
                                 Layout.fillWidth: true
-                                // 44, not 50: eleven pages now, and the rail
-                                // has to fit a 768 px tall screen whole.
+                                // 44, not 50: thirteen pages now, and the
+                                // rail has to fit a 768 px tall screen whole.
                                 implicitHeight: Theme.px(44)
                                 radius: Theme.px(4)
                                 color: nav.active ? Theme.c.surface2
