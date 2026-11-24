@@ -346,7 +346,13 @@ SettingsPage {
                 Layout.fillWidth: true
                 implicitHeight: Theme.px(34)
                 radius: Theme.r.tiny
-                color: cma.containsMouse ? Theme.c.surface3 : "transparent"
+                // Same colour throughout, only its own alpha animated -
+                // not toward "transparent" (black at alpha 0, flashes
+                // dark on the way to this grey) and not the item's own
+                // opacity either, which would fade the row's own
+                // content along with the background.
+                readonly property color fill: Theme.c.surface3
+                color: Qt.rgba(fill.r, fill.g, fill.b, cma.containsMouse ? 1 : 0)
                 Behavior on color { ColorAnimation { duration: Theme.fast } }
 
                 RowLayout {

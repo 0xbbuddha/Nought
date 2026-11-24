@@ -70,7 +70,14 @@ Flickable {
                 Layout.fillWidth: true
                 implicitHeight: Theme.px(42)
                 radius: Theme.r.chip
-                color: hma.containsMouse ? Theme.c.surface2 : "transparent"
+                // Same colour throughout, only its own alpha animated -
+                // not toward "transparent" (black at alpha 0, flashes
+                // dark on the way to this grey). Not the item's own
+                // opacity either: that already belongs to the entrance
+                // animation below, and fading it on hover too would
+                // fade the row's own content along with the background.
+                readonly property color fill: Theme.c.surface2
+                color: Qt.rgba(fill.r, fill.g, fill.b, hma.containsMouse ? 1 : 0)
                 Behavior on color { ColorAnimation { duration: Theme.fast } }
 
                 // Results land one after another, like the blocks of a page.

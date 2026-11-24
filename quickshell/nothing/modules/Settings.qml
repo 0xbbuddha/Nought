@@ -381,8 +381,16 @@ PanelWindow {
                                 // rail has to fit a 768 px tall screen whole.
                                 implicitHeight: Theme.px(44)
                                 radius: Theme.px(4)
-                                color: nav.active ? Theme.c.surface2
-                                     : (nma.containsMouse ? Theme.c.surface2 : "transparent")
+                                // Same colour throughout, only its own alpha
+                                // animated - not toward "transparent" (black
+                                // at alpha 0, so hue and alpha would
+                                // interpolate together and flash dark on the
+                                // way to this grey) and not the item's own
+                                // opacity either, which would fade the icon
+                                // and label sitting inside it along with it.
+                                readonly property color fill: Theme.c.surface2
+                                color: Qt.rgba(fill.r, fill.g, fill.b,
+                                    (nav.active || nma.containsMouse) ? 1 : 0)
                                 Behavior on color { ColorAnimation { duration: Theme.fast } }
 
                                 // A red rule down the edge, the same mark
