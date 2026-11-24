@@ -112,15 +112,35 @@ Singleton {
     // ── Glass ─────────────────────────────────────────────────────────
     // Nothing's fluted-glass wallpaper style (scripts/glass-wallpaper.py),
     // offered from both Settings and the picker rather than built twice:
-    // pick a photo, run it through the filter, set the result. One fixed
-    // output file, not a gallery - picking a new photo replaces it, the
-    // same way the bundled picture is just one file too.
+    // pick a photo, run it through the filter, set the result.
+    //
+    // Two files, alternating, not one fixed name overwritten in place:
+    // regenerating onto the same path left Config.wallpaper holding the
+    // exact string it already held, which QML does not treat as a change
+    // at all - no announce(), and the Image showing it never reloads
+    // either, cache or not, because its source url never changed. Picking
+    // a new photo kept quietly reapplying whatever the first one had
+    // rendered. Flipping which of the two files is written lands on a
+    // genuinely different path every time, which both Config and the
+    // Image actually react to - and writes the new one to whichever file
+    // is not currently on screen, so nothing overwrites a picture still
+    // being shown out from under it either.
     property bool glassBusy: false
     property string glassTarget: ""
     readonly property string glassScript:
         Quickshell.shellPath("../../scripts/glass-wallpaper.py")
-    readonly property string glassOut:
-        Quickshell.env("HOME") + "/.local/share/nothing/wallpapers/glass.png"
+
+    function glassOutFor(slot: int): string {
+        return Quickshell.env("HOME")
+            + "/.local/share/nothing/wallpapers/glass-" + slot + ".png";
+    }
+    // Read back from Config rather than kept as its own state: a reload
+    // resets anything not read from disk, and a slot starting over from
+    // 0 could easily be the one actually on screen, the exact file this
+    // whole scheme exists to leave alone.
+    readonly property int glassSlot:
+        (Config.wallpaper ?? "").endsWith("/glass-1.png") ? 1 : 0
+    readonly property string glassOut: root.glassOutFor(root.glassSlot)
 
     function glassify(target: string): void {
         if (root.glassBusy)
@@ -139,7 +159,9 @@ Singleton {
                 if (p === "")
                     return;
                 root.glassBusy = true;
-                glassRun.command = ["python3", root.glassScript, p, root.glassOut];
+                const next = 1 - root.glassSlot;
+                glassRun.nextOut = root.glassOutFor(next);
+                glassRun.command = ["python3", root.glassScript, p, glassRun.nextOut];
                 glassRun.running = true;
             }
         }
@@ -147,11 +169,12 @@ Singleton {
 
     NProcess {
         id: glassRun
+        property string nextOut: ""
         command: []
         onExited: (code) => {
             root.glassBusy = false;
             if (code === 0)
-                root.set(root.glassOut, root.glassTarget);
+                root.set(glassRun.nextOut, root.glassTarget);
         }
     }
 
