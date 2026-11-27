@@ -8,6 +8,10 @@ import Quickshell
 // Keys.onEscapePressed property in every file that imports it.
 // Kept by hand rather than read from "hyprctl binds", which only
 // returns "__lua 444" as the action and would be unreadable.
+//
+// An item's `id`, where one is set, is the same id services/Keybinds.qml
+// rebinds under - these keys are only the default, and Cheatsheet.qml is
+// what actually shows what is bound right now.
 Singleton {
     readonly property var groups: [
         {
@@ -15,25 +19,25 @@ Singleton {
             icon: "󰕰",
             items: [
                 { keys: ["SUPER"],          label: "Essential Search" },
-                { keys: ["SUPER", "R"],     label: "Essential Search" },
+                { id: "launcher",        keys: ["SUPER", "R"],     label: "Essential Search" },
                 { keys: ["SUPER", "Tab"],   label: "Essential Search" },
-                { keys: ["SUPER", "V"],     label: "Clipboard" },
-                { keys: ["SUPER", "N"],     label: "Control centre" },
-                { keys: ["SUPER", "B"],     label: "Notifications" },
-                { keys: ["SUPER", "G"],     label: "Game bar" },
-                { keys: ["SUPER", "I"],     label: "Settings" },
-                { keys: ["SUPER", "A"],     label: "Essential Space" },
-                { keys: ["SUPER", "ALT", "A"], label: "Essential Apps" },
-                { keys: ["SUPER", "ALT", "L"], label: "Nothing Launcher" },
-                { keys: ["SUPER", "SHIFT", "G"], label: "Next Glyph surface" },
-                { keys: ["SUPER", "P"],     label: "Displays, brightness, night light" },
-                { keys: ["SUPER", "ALT", "B"], label: "Night light on or off" },
-                { keys: ["SUPER", "ALT", "I"], label: "Keep the screen awake" },
-                { keys: ["CTRL", "SHIFT", "Esc"], label: "Processes" },
-                { keys: ["SUPER", "SHIFT", "T"], label: "Wallpaper picker" },
-                { keys: ["SUPER", "ALT", "W"], label: "Next wallpaper" },
-                { keys: ["SUPER", "/"],     label: "This cheatsheet" },
-                { keys: ["CTRL", "ALT", "Del"], label: "Session menu" }
+                { id: "clipboard",       keys: ["SUPER", "V"],     label: "Clipboard" },
+                { id: "bar",             keys: ["SUPER", "N"],     label: "Control centre" },
+                { id: "notifications",   keys: ["SUPER", "B"],     label: "Notifications" },
+                { id: "game",            keys: ["SUPER", "G"],     label: "Game bar" },
+                { id: "settings",        keys: ["SUPER", "I"],     label: "Settings" },
+                { id: "essential",       keys: ["SUPER", "A"],     label: "Essential Space" },
+                { id: "apps",            keys: ["SUPER", "ALT", "A"], label: "Essential Apps" },
+                { id: "nothinglauncher", keys: ["SUPER", "ALT", "L"], label: "Nothing Launcher" },
+                { id: "glyphnext",       keys: ["SUPER", "SHIFT", "G"], label: "Next Glyph surface" },
+                { id: "displays",        keys: ["SUPER", "P"],     label: "Displays, brightness, night light" },
+                { id: "nightlight",      keys: ["SUPER", "ALT", "B"], label: "Night light on or off" },
+                { id: "caffeine",        keys: ["SUPER", "ALT", "I"], label: "Keep the screen awake" },
+                { id: "processes",       keys: ["CTRL", "SHIFT", "Esc"], label: "Processes" },
+                { id: "wallpaperpicker", keys: ["SUPER", "SHIFT", "T"], label: "Wallpaper picker" },
+                { id: "wallpapernext",   keys: ["SUPER", "ALT", "W"], label: "Next wallpaper" },
+                { id: "cheatsheet",      keys: ["SUPER", "/"],     label: "This cheatsheet" },
+                { id: "session",         keys: ["CTRL", "ALT", "Del"], label: "Session menu" }
             ]
         },
         {

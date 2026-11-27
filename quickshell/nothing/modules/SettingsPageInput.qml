@@ -160,6 +160,84 @@ SettingsPage {
     }
 
     SettingsSection {
+        title: "Shortcuts"
+
+        NText {
+            Layout.fillWidth: true
+            text: "Opening a panel, not managing a window - everything "
+                + "else stays in hypr/hyprland/keybinds.lua"
+            color: Theme.c.onDim
+            font.pixelSize: Theme.f.tiny
+            wrapMode: Text.WordWrap
+        }
+
+        Repeater {
+            model: Keybinds.rebindable
+
+            SettingRow {
+                id: shortcut
+                required property var modelData
+                readonly property string combo: Keybinds.comboFor(shortcut.modelData.id)
+                readonly property bool overridden:
+                    shortcut.combo !== Keybinds.defaultCombo(shortcut.modelData)
+                property string conflict: ""
+
+                label: shortcut.modelData.label
+                hint: shortcut.conflict !== "" ? shortcut.conflict
+                    : (shortcut.overridden
+                        ? "Default: " + Keybinds.defaultCombo(shortcut.modelData)
+                        : "")
+
+                Timer {
+                    id: conflictClear
+                    interval: 2200
+                    onTriggered: shortcut.conflict = ""
+                }
+
+                RowLayout {
+                    spacing: Theme.px(6)
+
+                    KeyCapture {
+                        combo: shortcut.combo
+                        onCaptured: (combo) => {
+                            if (combo === shortcut.combo)
+                                return;
+                            const owner = Keybinds.rebindable.find(e =>
+                                e.id !== shortcut.modelData.id
+                                && Keybinds.comboFor(e.id) === combo);
+                            if (owner) {
+                                shortcut.conflict = combo + " is already " + owner.label;
+                                conflictClear.restart();
+                                return;
+                            }
+                            shortcut.conflict = "";
+                            Keybinds.setCombo(shortcut.modelData.id, combo);
+                        }
+                    }
+
+                    NPillButton {
+                        text: "Reset"
+                        visible: shortcut.overridden
+                        onActivated: Keybinds.setCombo(shortcut.modelData.id,
+                            Keybinds.defaultCombo(shortcut.modelData))
+                    }
+                }
+            }
+        }
+
+        SettingRow {
+            key: "keybindsReset"
+            label: "Every shortcut above"
+            hint: Keybinds.saved ? "" : "Working…"
+            NPillButton {
+                text: "Back to defaults"
+                visible: Object.keys(Config.keybindOverrides ?? {}).length > 0
+                onActivated: Keybinds.resetAll()
+            }
+        }
+    }
+
+    SettingsSection {
         title: "Input file"
 
         SettingRow {

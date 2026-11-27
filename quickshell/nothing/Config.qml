@@ -161,6 +161,11 @@ Singleton {
     property alias touchpadDisableTyping: a.touchpadDisableTyping
     property alias touchpadScrollFactor: a.touchpadScrollFactor
 
+    // { [id]: "MOD + KEY" }, Hyprland's own key names. Only entries that
+    // differ from Keybinds.qml's own default live here; a shortcut never
+    // touched by this stays out of it entirely.
+    property alias keybindOverrides: a.keybindOverrides
+
     // ── Game mode ─────────────────────────────────────────────────────
     property alias gameMode: a.gameMode
     property alias gameNoAnimations: a.gameNoAnimations
@@ -1014,6 +1019,7 @@ Singleton {
         a.touchpadNaturalScroll = true;
         a.touchpadDisableTyping = true;
         a.touchpadScrollFactor = 0.5;
+        a.keybindOverrides = {};
 
         a.lockBackground = "black";
 
@@ -1413,6 +1419,7 @@ Singleton {
             property bool   touchpadNaturalScroll: true
             property bool   touchpadDisableTyping: true
             property real   touchpadScrollFactor: 0.5
+            property var    keybindOverrides: ({})
 
             // ── Game mode ─────────────────────────────────────────────
             property bool gameMode: false
