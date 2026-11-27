@@ -15,6 +15,28 @@ OverlayWindow {
 
     property var results: Shortcuts.groups
 
+    // What is actually bound right now, not the shipped default: an
+    // item with no id is not one Settings > Input > Shortcuts covers,
+    // and shows exactly what it always has.
+    function effectiveKeys(item: var): var {
+        if (!item.id)
+            return item.keys;
+        const e = Keybinds.entry(item.id);
+        if (!e)
+            return item.keys;
+        const combo = Keybinds.comboFor(item.id);
+        if (combo === Keybinds.defaultCombo(e))
+            return item.keys;
+        // Hyprland's own names for a couple of keys read differently
+        // here than everywhere else in this list already does.
+        return combo.split(" + ").map(t => {
+            if (t === "Escape") return "Esc";
+            if (t === "Slash") return "/";
+            if (t === "Delete") return "Del";
+            return t;
+        });
+    }
+
     onShown: {
         field.text = "";
         win.results = Shortcuts.groups;
@@ -131,7 +153,7 @@ OverlayWindow {
                                     spacing: Theme.px(3)
 
                                     Repeater {
-                                        model: row.modelData.keys
+                                        model: win.effectiveKeys(row.modelData)
                                         KeyCap {
                                             required property string modelData
                                             text: modelData

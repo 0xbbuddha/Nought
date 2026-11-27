@@ -49,6 +49,12 @@ local function loadLua(path)
     return true
 end
 
+-- Settings > Input > Shortcuts writes this one; nothing here if nothing
+-- has ever been rebound. Before custom.lua/local.lua, which are the
+-- user's own and should get the last word if they ever touch the same
+-- key.
+loadLua(HYPR_DIR .. "/keybind-overrides.lua")
+
 local hyprConf = (os.getenv("HOME") or "") .. "/.config/hypr"
 if not loadLua(hyprConf .. "/custom.lua") then
     loadLua(HYPR_DIR .. "/custom.lua")
